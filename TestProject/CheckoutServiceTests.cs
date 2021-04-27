@@ -10,6 +10,7 @@ namespace TestProject
     public class CheckoutServiceTests
     {
         [TestMethod]
+        //Prove you can scan an item at a checkout
         public void CanItemScanAndReturnItem()
         {
             // Arrange
