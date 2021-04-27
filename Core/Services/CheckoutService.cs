@@ -30,6 +30,19 @@ namespace Core.Services
                 var itemInFull = _checkoutRepository.GetItem(item);
                 totalCost += itemInFull.ItemPrice;
                 itemsInFull.Add(itemInFull);
+                //Consider offers on items.....
+                //Could put the discounting in own class/methods that can be abstracted to use for multiple types of offers/discounts
+                var itemSpecialOffer = _checkoutRepository.GetSpecialOffer(item);
+                if (itemSpecialOffer != null)
+                {
+                    var sameItemsSoFar = itemsInFull.Where(i => i.SKU == item).ToList();
+                    //If no remainder then an exact offer quantity has been matched so apply offer
+                    if (sameItemsSoFar.Count() % itemSpecialOffer.Quantity == 0)
+                    {
+                        //Work out difference between cost and the special offer and apply it to totalCost
+                        totalCost += itemSpecialOffer.OfferPrice - (itemInFull.ItemPrice * itemSpecialOffer.Quantity);
+                    }
+                }
             }
             return totalCost;
         }

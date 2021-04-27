@@ -32,31 +32,54 @@ namespace TestProject
             // Arrange
             IEnumerable<string> testItems = new List<string>() { "A19", "B15", "C40" };
             var mockRepo = CreateTestRepository();
-            var itemService = new CheckoutService(mockRepo.Object);
+            var checkoutService = new CheckoutService(mockRepo.Object);
 
             //Act
-            var result = itemService.TotalOfItems(testItems);
+            var result = checkoutService.TotalOfItems(testItems);
 
             //Assert
             Assert.AreEqual(result, 0.50m + 0.30m + 0.60m);
         }
+        [TestMethod]
+        //Prove you can request the total price inclusive of offers
+        public void ProveScenarioWorksTakingIntoAccountSpecialOffers()
+        {
+            // Arrange
+            IEnumerable<string> testItems = new List<string>() { "B15", "A19", "B15" };
+            var mockRepo = CreateTestRepository();
+            var checkoutService = new CheckoutService(mockRepo.Object);
+
+            //Act
+            var result = checkoutService.TotalOfItems(testItems);
+
+            //Assert
+            Assert.AreEqual(result, 0.50m + 0.45m);
+        }
         public static Mock<ICheckoutRepository> CreateTestRepository()
         {
-
             IEnumerable<Item> testItem = new List<Item>()
             {
                 new Item { SKU = "A19", ItemPrice = 0.50m },
                 new Item { SKU = "B15", ItemPrice = 0.30m },
                 new Item { SKU = "C40", ItemPrice = 0.60m }
             };
-  
+            IEnumerable<SpecialOffer> testOffers = new List<SpecialOffer>()
+            {
+                new SpecialOffer { SKU = "A19", Quantity = 3, OfferPrice = 1.30m },
+                new SpecialOffer { SKU = "B15", Quantity = 2, OfferPrice = 0.45m }
+            };
             var mockRepo = new Mock<ICheckoutRepository>();
             foreach (var item in testItem)
             {
                 mockRepo.Setup(repo => repo.GetItem(item.SKU))
                       .Returns(item);
             }
-             return mockRepo;
+            foreach (var offer in testOffers)
+            {
+                mockRepo.Setup(repo => repo.GetSpecialOffer(offer.SKU))
+                      .Returns(offer);
+            }
+            return mockRepo;
         }
     }
 }
