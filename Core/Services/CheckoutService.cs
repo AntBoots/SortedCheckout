@@ -20,5 +20,18 @@ namespace Core.Services
         {
             return _checkoutRepository.GetItem(SKU);
         }
+        //TotalOfItems just expects a list of scanned items' SKU codes
+        public decimal TotalOfItems(IEnumerable<string> items)
+        {
+            decimal totalCost = 0m;
+            List<Item> itemsInFull = new List<Item>();
+            foreach (var item in items)
+            {
+                var itemInFull = _checkoutRepository.GetItem(item);
+                totalCost += itemInFull.ItemPrice;
+                itemsInFull.Add(itemInFull);
+            }
+            return totalCost;
+        }
     }
 }

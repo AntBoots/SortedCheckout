@@ -6,5 +6,6 @@ namespace Core.Interfaces
     public interface ICheckoutService
     {
         Item ScanItem(string SKU);
+        decimal TotalOfItems(IEnumerable<string> items);
     }
 }
